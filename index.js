@@ -9,7 +9,7 @@ aplicacion.get('/enviarEmail', (req, res) => {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
     const msg = {
         to: 'verobc.cel@gmail.com',
-        from: 'verofbk@gmail.com',
+        from: 'verobc.cel@gmail.com',
         subject: 'Enviando correos con SendGrid is Fun',
         text: 'Esta es una prueba para enviar correos',
         html: '<strong>Esta es una prueba para enviar correos</strong>',
