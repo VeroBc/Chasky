@@ -1,22 +1,26 @@
-const expresso = require('express')
+const express = require('express')
 const sgMail = require('@sendgrid/mail');
 
-const aplicacion = expresso()
+const app = express()
+app.use(express.urlencoded({ extended: false }));
+
 const puerto = 7778
+const msg = {
+    to: 'verobc.cel@gmail.com',
+    from: 'verobc.cel@gmail.com'
+};
 
-aplicacion.get('/enviarEmail', (req, res) => {
+app.get('/enviarEmail', (req, res) => {
 
-    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-    const msg = {
-        to: 'verobc.cel@gmail.com',
-        from: 'verobc.cel@gmail.com',
-        subject: 'Enviando correos con SendGrid is Fun',
-        text: 'Esta es una prueba para enviar correos',
-        html: '<strong>Esta es una prueba para enviar correos</strong>',
-    };
+    sgMail.setApiKey(SENDGRID_API_KEY);
+
+    let aMsg = msg;
+    aMsg.subject ='Enviando correos con SendGrid is Fun'
+    aMsg.text = 'Esta es una prueba para enviar correos'
+    aMsg.html = '<strong>Esta es una prueba para enviar correos</strong>'
 
     sgMail
-        .send(msg)
+        .send(aMsg)
         .then(() => {console.log('correo enviado')}, console.error);
  /*
     (async () => {
@@ -31,17 +35,54 @@ aplicacion.get('/enviarEmail', (req, res) => {
     res.send('Aquí vamos a mandar un email')
 });
 
-aplicacion.get('/', (req, res) => res.send('Frase de prueba batch 3'))
+app.get('/', (req, res) => res.send('Frase de prueba batch 3'))
 
-aplicacion.get('/enviarPrueba', (req, res) => res.send('Aquí vamos Perú'))
+app.get('/enviarPrueba', (req, res) => res.send('Aquí vamos Perú'))
 
-aplicacion.get('/enviarFoto',  (req, res) => {
+app.get('/enviarFoto',  (req, res) => {
     res.sendFile( __dirname + '/imagenes/unafoto.jpg');
 });
 
-aplicacion.get('/enviarHTML',  (req, res) => {
+app.get('/enviarHTML',  (req, res) => {
     res.sendFile( __dirname + '/HTML/jsbin.lotus.html');
 });
 
-aplicacion.listen(puerto, () => console.log(`Estamos empezando a escucharte querido, o sea habla my friend ${puerto}!`))
+app.get('/llenarForm',  (req, res) => {
+    res.sendFile( __dirname + '/HTML/userForm.html');
+});
+
+app.get('/estilos/userForm',  (req, res) => {
+    res.sendFile( __dirname + '/CSS/userForm.css');
+});
+
+app.post('/recibirData',  (req, res) => {
+
+    let mensaje = "Gracias por enviar la información: ";
+    mensaje += " Nombre: " +req.body.fname + " " + req.body.lname + "."
+    mensaje += " DNI: "+ req.body.dni
+    mensaje += ". Género: " + req.body.gender 
+    mensaje += ". Ciudad: " + req.body.ciudad
+
+    if ( req.body.hobbie1 != null) 
+        mensaje += ". Hobbie 1: " + req.body.hobbie1
+
+    if ( req.body.hobbie2 != null)    
+        mensaje += ". Hobbie 2: " + req.body.hobbie2
+
+    if ( req.body.hobbie3 != null)
+        mensaje += ". Hobbie 3: " + req.body.hobbie3
+
+    res.send(mensaje);
+
+    sgMail.setApiKey(SENDGRID_API_KEY);
+
+    let aMsg = msg;
+    aMsg.subject ='Recibir data de formulario'
+    aMsg.text = mensaje
+    sgMail.send(aMsg)
+
+});
+
+
+app.listen(puerto, () => console.log(`Estamos empezando a escucharte querido, o sea habla my friend ${puerto}!`))
 
